@@ -220,7 +220,7 @@ class AnnealRunner():
 
 
     def test(self):
-        states = torch.load(os.path.join(self.args.log, 'checkpoint.pth'), map_location=self.config.device)
+        states = torch.load(self.args.ckpt_file, map_location=self.config.device)
         score = CondRefineNetDilated(self.config).to(self.config.device)
         score = torch.nn.DataParallel(score)
 
@@ -273,8 +273,8 @@ class AnnealRunner():
                     im = Image.fromarray(image_grid.mul_(255).add_(0.5).clamp_(0, 255).permute(1, 2, 0).to('cpu', torch.uint8).numpy())
                     imgs.append(im)
 
-                save_image(image_grid, os.path.join(self.args.image_folder, 'image_{}.png'.format(i)), nrow=10)
-                torch.save(sample, os.path.join(self.args.image_folder, 'image_raw_{}.pth'.format(i)))
+                save_image(image_grid, os.path.join(self.args.image_folder, 'image_{:06d}.png'.format(i)), nrow=10)
+                torch.save(sample, os.path.join(self.args.image_folder, 'image_raw_{:06d}.pth'.format(i)))
 
         imgs[0].save(os.path.join(self.args.image_folder, "movie.gif"), save_all=True, append_images=imgs[1:], duration=1, loop=0)
 

@@ -1,3 +1,4 @@
+from easydict import EasyDict
 import argparse
 import traceback
 import time
@@ -9,6 +10,8 @@ import os
 import torch
 import numpy as np
 from runners import *
+
+from template_lib.v2.config import update_parser_defaults_from_yaml, global_cfg, update_config, get_dict_str
 
 
 def parse_args_and_config():
@@ -25,6 +28,8 @@ def parse_args_and_config():
     parser.add_argument('--resume_training', action='store_true', help='Whether to resume training')
     parser.add_argument('-o', '--image_folder', type=str, default='images', help="The directory of image outputs")
 
+    update_parser_defaults_from_yaml(parser)
+
     args = parser.parse_args()
     run_id = str(os.getpid())
     run_time = time.strftime('%Y-%b-%d-%H-%M-%S')
@@ -37,9 +42,10 @@ def parse_args_and_config():
             config = yaml.load(f)
         new_config = dict2namespace(config)
     else:
-        with open(os.path.join(args.log, 'config.yml'), 'r') as f:
-            config = yaml.load(f)
-        new_config = config
+        # with open(args.config_file, 'r') as f:
+        #     config = yaml.load(f)
+        # new_config = config
+        new_config = update_config({}, global_cfg)
 
     if not args.test:
         if not args.resume_training:
